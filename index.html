@@ -29,6 +29,7 @@
         width: min(88vw, 760px);
         aspect-ratio: 4 / 3;
         perspective: 820px;
+        transform: translateZ(0);
       }
 
       .cloud {
@@ -37,6 +38,8 @@
         transform-style: preserve-3d;
         filter: drop-shadow(0 18px 14px rgba(0, 0, 0, 0.2));
         will-change: transform, filter;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
       }
 
       .card {
@@ -53,6 +56,9 @@
         place-items: center;
         overflow: hidden;
         will-change: transform, box-shadow;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        contain: paint;
         box-shadow:
           0 10px 20px -8px rgba(0, 0, 0, 0.24),
           0 4px 10px rgba(0, 0, 0, 0.14);
@@ -68,6 +74,8 @@
         line-height: 0.82;
         transform: translateY(9%);
         user-select: none;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
       }
 
       .card.black {
@@ -143,9 +151,6 @@
           `rotateX(${tiltX}deg) rotateY(${tiltY}deg) rotateZ(${tiltZ}deg) translateY(${
             Math.sin(t * 2.1) * -9
           }px)`;
-        cloud.style.filter = `drop-shadow(0 ${18 + Math.sin(t * 1.2) * 4}px ${
-          14 + Math.cos(t * 1.35) * 4
-        }px rgba(0, 0, 0, 0.25))`;
 
         const hue = 214 + Math.sin(t * 2.1) * 28;
         const sat = 86 + (Math.sin(t * 2.6 + 1.4) + 1) * 7;
@@ -168,7 +173,7 @@
           const radiusY = 154 + Math.sin(t * 1.6 + i * 0.27) * 34;
           const radiusZ = 236 + Math.cos(t * 1.75 + i * 0.19) * 58;
           const y = Math.sin(yzAngle) * radiusY;
-          const z = Math.cos(yzAngle) * radiusZ + c.depthBias * 2.1;
+          const z = Math.cos(yzAngle) * radiusZ + c.depthBias * 2.1 + i * 0.45;
 
           // Slight X drift keeps a soft 3D helix look.
           const x =
