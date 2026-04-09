@@ -28,7 +28,7 @@
         position: relative;
         width: min(88vw, 760px);
         aspect-ratio: 4 / 3;
-        perspective: 1200px;
+        perspective: 820px;
       }
 
       .cloud {
@@ -52,7 +52,10 @@
         display: grid;
         place-items: center;
         overflow: hidden;
-        will-change: transform;
+        will-change: transform, box-shadow;
+        box-shadow:
+          0 10px 20px -8px rgba(0, 0, 0, 0.24),
+          0 4px 10px rgba(0, 0, 0, 0.14);
       }
 
       .card span {
@@ -112,6 +115,7 @@
         const n = index / (count - 1);
         cards.push({
           el,
+          kind,
           baseAngle,
           band: n,
           depthBias: (0.5 - n) * 16
@@ -132,49 +136,68 @@
       function tick() {
         const t = (performance.now() - start) / 1000;
 
-        const tiltX = 6 + Math.sin(t * 0.8) * 2.8;
-        const tiltY = -4 + Math.cos(t * 0.65) * 5.2;
-        const tiltZ = Math.sin(t * 0.52) * 2.4;
+        const tiltX = 7 + Math.sin(t * 1.35) * 4.2;
+        const tiltY = -5 + Math.cos(t * 1.1) * 7.6;
+        const tiltZ = Math.sin(t * 0.95) * 3.5;
         cloud.style.transform =
           `rotateX(${tiltX}deg) rotateY(${tiltY}deg) rotateZ(${tiltZ}deg) translateY(${
-            Math.sin(t * 1.35) * -6
+            Math.sin(t * 2.1) * -9
           }px)`;
+        cloud.style.filter = `drop-shadow(0 ${18 + Math.sin(t * 1.2) * 4}px ${
+          14 + Math.cos(t * 1.35) * 4
+        }px rgba(0, 0, 0, 0.25))`;
 
-        const hue = 212 + Math.sin(t * 0.45) * 9;
-        document.documentElement.style.setProperty("--blue", `hsl(${hue.toFixed(1)} 95% 52%)`);
+        const hue = 214 + Math.sin(t * 2.1) * 28;
+        const sat = 86 + (Math.sin(t * 2.6 + 1.4) + 1) * 7;
+        const light = 38 + (Math.sin(t * 3.1 + 0.7) + 1) * 13;
+        document.documentElement.style.setProperty(
+          "--blue",
+          `hsl(${hue.toFixed(1)} ${sat.toFixed(1)}% ${light.toFixed(1)}%)`
+        );
 
         for (let i = 0; i < cards.length; i++) {
           const c = cards[i];
 
           // Smoothly varying arc offsets (eased, continuous).
-          const phase = (Math.sin(t * 1.05 + i * 0.22) + 1) * 0.5;
+          const phase = (Math.sin(t * 1.9 + i * 0.22) + 1) * 0.5;
           const eased = easeInOutSine(phase);
-          const arcOffset = (eased - 0.5) * 0.9;
+          const arcOffset = (eased - 0.5) * 1.25;
 
           // Circular motion specifically in Y/Z to create orbiting arc paths.
-          const yzAngle = c.baseAngle + t * 1.12 + arcOffset;
-          const radiusY = 148 + Math.sin(t * 0.9 + i * 0.27) * 26;
-          const radiusZ = 178 + Math.cos(t * 1.05 + i * 0.19) * 34;
+          const yzAngle = c.baseAngle + t * 2.05 + arcOffset;
+          const radiusY = 154 + Math.sin(t * 1.6 + i * 0.27) * 34;
+          const radiusZ = 236 + Math.cos(t * 1.75 + i * 0.19) * 58;
           const y = Math.sin(yzAngle) * radiusY;
-          const z = Math.cos(yzAngle) * radiusZ + c.depthBias;
+          const z = Math.cos(yzAngle) * radiusZ + c.depthBias * 2.1;
 
           // Slight X drift keeps a soft 3D helix look.
           const x =
-            Math.cos(c.baseAngle + t * 0.6) * 116 +
-            Math.sin(t * 1.8 + i * 0.31) * 14;
+            Math.cos(c.baseAngle + t * 1.05) * 134 +
+            Math.sin(t * 3 + i * 0.31) * 20;
 
           // Dramatic scale breathing, strongest near front-facing cards.
           const front = (Math.cos(yzAngle) + 1) * 0.5;
-          const pulse = easeInOutSine((Math.sin(t * 2.7 + i * 0.4) + 1) * 0.5);
-          const scale = 0.5 + front * 0.62 + pulse * 0.2;
+          const pulse = easeInOutSine((Math.sin(t * 4.1 + i * 0.4) + 1) * 0.5);
+          const centerBoost = c.el.classList.contains("center") ? 0.26 : 0;
+          const scale = 0.38 + front * 0.95 + pulse * 0.24 + centerBoost;
 
-          const yaw = Math.sin(t * 1.4 + i * 0.18) * 5 + Math.cos(yzAngle) * 12;
-          const pitch = Math.cos(t * 1.2 + i * 0.24) * 3;
-          const roll = (c.baseAngle * 180) / Math.PI + Math.sin(t * 1.1 + i * 0.3) * 4;
+          const yaw = Math.sin(t * 2.4 + i * 0.18) * 8 + Math.cos(yzAngle) * 18;
+          const pitch = Math.cos(t * 2.1 + i * 0.24) * 5.5;
+          const roll = (c.baseAngle * 180) / Math.PI + Math.sin(t * 1.9 + i * 0.3) * 6;
 
           c.el.style.transform =
             `translate3d(${x}px, ${y}px, ${z}px) ` +
             `rotateX(${pitch}deg) rotateY(${yaw}deg) rotateZ(${roll}deg) scale(${scale})`;
+          const shadowY = 8 + front * 26;
+          const shadowBlur = 12 + front * 44;
+          const shadowSpread = -10 + front * 4;
+          const shadowAlpha = 0.16 + front * 0.22;
+          const ambientAlpha = 0.08 + front * 0.1;
+          const rimAlpha = c.kind === "blue" ? 0.22 : 0.12;
+          c.el.style.boxShadow =
+            `0 ${shadowY}px ${shadowBlur}px ${shadowSpread}px rgba(0, 0, 0, ${shadowAlpha}), ` +
+            `0 4px 12px rgba(0, 0, 0, ${ambientAlpha}), ` +
+            `inset 0 1px 0 rgba(255, 255, 255, ${rimAlpha})`;
         }
 
         requestAnimationFrame(tick);
