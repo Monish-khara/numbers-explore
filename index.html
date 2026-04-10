@@ -11,6 +11,14 @@
         --black: #0a0a0a;
       }
 
+      @font-face {
+        font-family: "Cursor Display";
+        src: url("./assets/fonts/CURSORDisplay260410-Medium.otf") format("opentype");
+        font-weight: 500;
+        font-style: normal;
+        font-display: swap;
+      }
+
       * {
         box-sizing: border-box;
       }
@@ -21,7 +29,7 @@
         display: grid;
         place-items: center;
         background: var(--bg);
-        font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+        font-family: "Cursor Display", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
       }
 
       .stage {
@@ -68,6 +76,7 @@
         display: block;
         width: 100%;
         text-align: center;
+        font-family: "Cursor Display", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
         font-weight: 500;
         letter-spacing: 0.01em;
         font-size: clamp(64px, 11vw, 98px);
